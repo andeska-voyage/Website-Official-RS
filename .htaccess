@@ -1,0 +1,22 @@
+RewriteEngine On
+
+# 1. Proteksi Folder (Forbidden Access)
+Options -Indexes
+
+# 2. Redirect URL yang pakai .php ke versi TANPA .php
+# PENTING: Tambahkan kondisi !POST agar form login tidak error
+RewriteCond %{REQUEST_METHOD} !POST
+RewriteCond %{THE_REQUEST} /([^.]+)\.php [NC]
+RewriteRule ^ /_Companyprofile/%1? [NC,L,R=301]
+
+# 3. Rewrite Internal (System baca file .php)
+# Contoh: user ketik 'artikel', system buka 'artikel.php'
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [NC,L]
+
+# 4. Proteksi File Sensitif
+<FilesMatch "\.(htaccess|sql|log|ini|json)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
