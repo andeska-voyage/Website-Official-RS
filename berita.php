@@ -4,12 +4,12 @@ require_once 'config/database.php';
  $db = new Database();
 
 // Ambil parameter
- $category_filter = isset($_GET['category']) ? $_GET['category'] : null;
- $search_query = isset($_GET['search']) ? $_GET['search'] : null;
+ $category_filter = $_GET['category'] ?? '';
+ $search_query = $_GET['search'] ?? '';
 
-// Pagination
+// Pagination Setup
  $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
- $limit = 5;
+ $limit = 6; // Jumlah berita per halaman
  $offset = ($page > 1) ? ($page * $limit) - $limit : 0;
 
 // === LOGIKA QUERY DINAMIS ===
@@ -52,7 +52,10 @@ foreach($params_count as $key => $val) { $db->bind($key, $val); }
  $posts = $db->resultSet();
 
 // Ambil Kategori untuk Sidebar
- $db->query("SELECT c.id, c.name, c.slug, COUNT(p.id) as post_count FROM categories c LEFT JOIN posts p ON c.id = p.category_id GROUP BY c.id ORDER BY c.name ASC");
+ $db->query("SELECT c.id, c.name, c.slug, COUNT(p.id) as post_count 
+            FROM categories c 
+            LEFT JOIN posts p ON c.id = p.category_id 
+            GROUP BY c.id ORDER BY c.name ASC");
  $categories = $db->resultSet();
 
 require_once 'inc/header.php';
@@ -82,7 +85,7 @@ require_once 'inc/header.php';
                                     <?php if($category_filter): ?>
                                         <input type="hidden" name="category" value="<?php echo htmlspecialchars($category_filter); ?>">
                                     <?php endif; ?>
-                                    <input type="text" name="search" class="form-control form-control-lg border-0" placeholder="Cari judul atau isi berita..." value="<?php echo htmlspecialchars($search_query); ?>">
+                                    <input type="text" name="search" class="form-control form-control-lg border-0" placeholder="Cari judul atau isi berita..." value="<?php echo htmlspecialchars($search_query ?? ''); ?>">
                                     <button class="btn btn-primary px-4" type="submit"><i class="fas fa-search"></i></button>
                                     <?php if($search_query): ?>
                                         <a href="berita<?php echo $category_filter ? '?category='.$category_filter : ''; ?>" class="btn btn-secondary px-3"><i class="fas fa-times"></i></a>
@@ -143,32 +146,39 @@ require_once 'inc/header.php';
                             </div>
                         <?php endif; ?>
 
-                        <!-- Pagination -->
+                        <!-- === PAGINATION === -->
                         <?php if($totalPages > 1): ?>
                         <div class="col-12 mt-5">
                             <nav>
                                 <ul class="pagination justify-content-center">
-                                    <?php if($page > 1): ?>
-                                    <li class="page-item">
-                                        <a class="page-link rounded-pill mx-1" href="?page=<?php echo $page-1; ?>&category=<?php echo $category_filter; ?>&search=<?php echo $search_query; ?>"><i class="fas fa-chevron-left"></i></a>
+                                    <!-- Tombol Previous -->
+                                    <li class="page-item <?php echo ($page <= 1) ? 'disabled' : ''; ?>">
+                                        <a class="page-link rounded-pill mx-1" href="?page=<?php echo $page-1; ?>&category=<?php echo $category_filter; ?>&search=<?php echo $search_query; ?>">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
                                     </li>
-                                    <?php endif; ?>
 
+                                    <!-- Nomor Halaman -->
                                     <?php for($i = 1; $i <= $totalPages; $i++): ?>
                                     <li class="page-item <?php echo ($page == $i) ? 'active' : ''; ?>">
-                                        <a class="page-link rounded-circle mx-1" href="?page=<?php echo $i; ?>&category=<?php echo $category_filter; ?>&search=<?php echo $search_query; ?>"><?php echo $i; ?></a>
+                                        <a class="page-link rounded-circle mx-1" href="?page=<?php echo $i; ?>&category=<?php echo $category_filter; ?>&search=<?php echo $search_query; ?>">
+                                            <?php echo $i; ?>
+                                        </a>
                                     </li>
                                     <?php endfor; ?>
 
-                                    <?php if($page < $totalPages): ?>
-                                    <li class="page-item">
-                                        <a class="page-link rounded-pill mx-1" href="?page=<?php echo $page+1; ?>&category=<?php echo $category_filter; ?>&search=<?php echo $search_query; ?>"><i class="fas fa-chevron-right"></i></a>
+                                    <!-- Tombol Next -->
+                                    <li class="page-item <?php echo ($page >= $totalPages) ? 'disabled' : ''; ?>">
+                                        <a class="page-link rounded-pill mx-1" href="?page=<?php echo $page+1; ?>&category=<?php echo $category_filter; ?>&search=<?php echo $search_query; ?>">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
                                     </li>
-                                    <?php endif; ?>
                                 </ul>
                             </nav>
                         </div>
                         <?php endif; ?>
+                        <!-- End Pagination -->
+
                     </div>
                 </div>
 

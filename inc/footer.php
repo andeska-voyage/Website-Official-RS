@@ -55,7 +55,7 @@
                         <div class="footer-item">
                             <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">Lokasi Kami</h4>
                             <div class="map-container rounded overflow-hidden border border-primary shadow-sm">
-                                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.27759836539!2d100.37355831475392!3d-0.9459054993162754!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2fd4b87c2d5b3b9d%3A0x3027a76e0e0b30!2sRSIA%20Restu%20Ibu!5e0!3m2!1sid!2sid!4v1698765432100!5m2!1sid!2sid" width="100%" height="200" style="border:0; filter: grayscale(20%) contrast(1.1);" allowfullscreen="" loading="lazy"></iframe>
+                                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d997.317473909205!2d100.36666556339215!3d-0.9500020679561254!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2fd4b938b73ce47b%3A0xe8c52430e2f7636b!2sRumah%20Sakit%20Ibu%20dan%20Anak%20Restu%20Ibu!5e0!3m2!1sid!2sid!4v1772526313992!5m2!1sid!2sid" width="100%" height="200" style="border:0; filter: grayscale(20%) contrast(1.1);" allowfullscreen="" loading="lazy"></iframe>
                             </div>
                         </div>
                     </div>

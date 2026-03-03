@@ -48,29 +48,41 @@ require_once 'nav_admin.php';
                     </div>
                     <div class="mb-3">
                         <label>Sejarah</label>
-                        <textarea name="history" id="editor_history" class="form-control"><?php echo $profile['history']; ?></textarea>
+                        <textarea name="history" id="editor_history" class="form-control summernote-editor"><?php echo $profile['history']; ?></textarea>
                     </div>
                 </div>
             </div>
             <div class="mb-3">
                 <label>Visi</label>
-                <textarea name="vision" id="editor_vision" class="form-control" rows="2"><?php echo $profile['vision']; ?></textarea>
+                <textarea name="vision" id="editor_vision" class="form-control summernote-editor" rows="2"><?php echo $profile['vision']; ?></textarea>
             </div>
             <div class="mb-3">
                 <label>Misi</label>
-                <textarea name="mission" id="editor_mission" class="form-control" rows="4"><?php echo $profile['mission']; ?></textarea>
+                <textarea name="mission" id="editor_mission" class="form-control summernote-editor" rows="4"><?php echo $profile['mission']; ?></textarea>
             </div>
             <div class="mb-3">
                 <label>Tujuan</label>
-                <textarea name="goals" id="editor_goals" class="form-control" rows="4"><?php echo $profile['goals']; ?></textarea>
+                <textarea name="goals" id="editor_goals" class="form-control summernote-editor" rows="4"><?php echo $profile['goals']; ?></textarea>
             </div>
             <button type="submit" class="btn btn-primary w-100">Simpan Perubahan</button>
         </form>
     </div>
 
     <!-- TinyMCE -->
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+        <!-- Summernote untuk Settings -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+
     <script>
-      tinymce.init({ selector: 'textarea', menubar: false, height: 200, plugins: 'lists', toolbar: 'bold italic | bullist numlist' });
+        $(document).ready(function() {
+            // Inisialisasi semua textarea dengan class summernote-editor
+            $('.summernote-editor').summernote({
+                height: 150,
+                toolbar: [
+                    ['font', ['bold', 'italic', 'underline']],
+                    ['para', ['ul', 'ol']],
+                ]
+            });
+        });
     </script>
 <?php require_once 'footer_admin.php'; ?>

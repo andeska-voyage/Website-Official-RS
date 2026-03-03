@@ -1,3 +1,14 @@
+<?php
+// === TAMBAHAN: Ambil Logo untuk Favicon & Sidebar ===
+if (!isset($db)) {
+    // Pastikan path benar relative dari posisi file ini
+    require_once '../config/database.php';
+    $db = new Database();
+}
+ $db->query("SELECT logo FROM site_profile WHERE id=1");
+ $siteData = $db->single();
+ $adminLogo = $siteData['logo'] ?? 'default.jpg';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +20,11 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     
+    <!-- TAMBAHAN: Favicon -->
+    <link rel="icon" href="../img/<?php echo htmlspecialchars($adminLogo); ?>">
+    
     <style>
+        /* ... (CSS Anda Tetap Sama Persis, Tidak Diubah ...) */
         :root {
             --sidebar-width: 250px;
             --primary-color: #4a51f9; /* Modern Blue/Purple */
@@ -41,6 +56,7 @@
             padding: 20px;
             background-color: rgba(0,0,0,0.1);
             border-bottom: 1px solid rgba(255,255,255,0.05);
+            text-align: center; /* Tambahkan ini agar logo di tengah */
         }
 
         .sidebar-menu {
@@ -122,6 +138,22 @@
             padding: 15px 20px;
             font-weight: 600;
         }
+        
+        /* Fix Dropdown Summernote jika tersembunyi oleh CSS Admin */
+        .note-btn-group .dropdown-menu {
+            display: none; /* Default */
+        }
+        .note-btn-group.open .dropdown-menu {
+            display: block !important;
+            position: absolute;
+            background: #fff;
+            border: 1px solid #ddd;
+            z-index: 9999;
+            min-width: 100px;
+        }
+        .dropdown-item:hover {
+            background-color: #f0f0f0;
+        }
 
         /* Responsive */
         @media (max-width: 992px) {
@@ -136,7 +168,10 @@
     <!-- Sidebar -->
     <nav class="sidebar">
         <div class="sidebar-header">
-            <h5 class="mb-0 fw-bold"><i class="bi bi-hospital me-2"></i>RSIA Admin</h5>
+            <!-- TAMBAHAN: Logo Gambar -->
+            <img src="../img/<?php echo htmlspecialchars($adminLogo); ?>" alt="Logo" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #fff; margin-bottom: 10px; object-fit: cover;">
+            
+            <h5 class="mb-0 fw-bold">RSIA Admin</h5>
             <small class="text-muted">Management System</small>
         </div>
 
@@ -157,6 +192,12 @@
             <div class="menu-label">SDM (Manusia)</div>
             <a href="doctors" class="nav-link <?php echo (basename($_SERVER['PHP_SELF'])=='doctors')?'active':''; ?>">
                 <i class="bi bi-person-badge-fill"></i> Dokter
+            </a>
+            <a href="schedules" class="nav-link <?php echo (basename($_SERVER['PHP_SELF'])=='schedules')?'active':''; ?>">
+                <i class="bi bi-clock-fill"></i> Jadwal Dokter
+            </a>
+             <a href="spesialis" class="nav-link <?php echo (basename($_SERVER['PHP_SELF'])=='spesialis')?'active':''; ?>">
+                <i class="bi bi-award"></i> Spesialis
             </a>
             <a href="staff" class="nav-link <?php echo (basename($_SERVER['PHP_SELF'])=='staff')?'active':''; ?>">
                 <i class="bi bi-people-fill"></i> Karyawan

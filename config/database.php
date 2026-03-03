@@ -2,8 +2,8 @@
 // Konfigurasi Database
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'db_rsia');
-define('DB_USER', 'root'); // Sesuaikan dengan user MySQL Anda
-define('DB_PASS', '');     // Sesuaikan dengan password MySQL Anda
+define('DB_USER', 'db_rsia'); // Sesuaikan dengan user MySQL Anda
+define('DB_PASS', 'pT5sBDFEjHRKTrRh');     // Sesuaikan dengan password MySQL Anda
 
 class Database {
     private $host = DB_HOST;

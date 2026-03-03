@@ -1062,3 +1062,23 @@ h6,
         right: 20px;
     }
 }
+
+/* Penyesuaian Logo Navbar */
+.navbar-brand img {
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover img {
+    transform: scale(1.05);
+}
+
+/* Penyesuaian Logo Admin Sidebar */
+.sidebar .brand img {
+    border-radius: 50%; /* Buat logo jadi bulan jika perlu */
+    border: 2px solid #fff;
+}
+
+/* Animasi Kedip untuk Notifikasi */
+@keyframes blinker {
+    50% { opacity: 0; }
+}

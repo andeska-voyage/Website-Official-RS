@@ -1,12 +1,18 @@
 <?php
-session_start(); if (!isset($_SESSION['admin_id'])) { header('Location: login'); exit; }
+session_start(); 
+if (!isset($_SESSION['admin_id'])) { header('Location: login'); exit; }
 require_once '../config/database.php';
  $db = new Database();
 
-// Stats
- $db->query("SELECT COUNT(*) as total FROM doctors"); $docCount = $db->single()['total'];
- $db->query("SELECT COUNT(*) as total FROM posts"); $postCount = $db->single()['total'];
- $db->query("SELECT COUNT(*) as total FROM staff"); $staffCount = $db->single()['total'];
+// Hitung Statistik (Menggunakan nama tabel yang benar: dokter, posts, staff)
+ $db->query("SELECT COUNT(*) as total FROM dokter"); 
+ $docCount = $db->single()['total'];
+
+ $db->query("SELECT COUNT(*) as total FROM posts"); 
+ $postCount = $db->single()['total'];
+
+ $db->query("SELECT COUNT(*) as total FROM staff"); 
+ $staffCount = $db->single()['total'];
 
 require_once 'nav_admin.php';
 ?>

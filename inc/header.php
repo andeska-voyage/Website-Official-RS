@@ -4,6 +4,25 @@
 // Handle root path
  $currentPage = basename(parse_url($currentUrl, PHP_URL_PATH));
 if($currentPage == "") $currentPage = "index"; // root url
+// 1. Ambil data Profil & Logo dari Database
+if (!isset($db)) {
+    require_once 'config/database.php';
+    $db = new Database();
+}
+
+ $db->query("SELECT * FROM site_profile WHERE id=1");
+ $site_profile = $db->single();
+ $site_logo = $site_profile['logo'] ?? 'default.jpg';
+ $site_motto = $site_profile['motto'] ?? 'Melayani dengan Kasih Ibu';
+ 
+ // === TAMBAHAN: CEK BERITA TERBARU (1 BULAN TERAKHIR) ===
+ $db->query("SELECT COUNT(*) as total FROM posts WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)");
+ $newPostsData = $db->single();
+ $newPostsCount = $newPostsData['total'];
+ // === TAMBAHAN: CEK PENGUMUMAN BARU (1 BULAN TERAKHIR) ===
+ $db->query("SELECT COUNT(*) as total FROM announcements WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)");
+ $newAnnData = $db->single();
+ $newAnnCount = $newAnnData['total'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,6 +33,8 @@ if($currentPage == "") $currentPage = "index"; // root url
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
+    <!-- FAVICON (Logo di Tab Browser) -->
+    <link rel="icon" type="image/x-icon" href="img/<?php echo htmlspecialchars($site_logo); ?>">
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,8 +86,14 @@ if($currentPage == "") $currentPage = "index"; // root url
         <div class="container px-0">
             <!-- Ubah expand-lg agar menu lebih cepat collapse di tablet -->
             <nav class="navbar navbar-expand-lg navbar-light py-3">
-                <a href="index.php" class="navbar-brand">
-                    <h1 class="text-primary display-6 m-0" style="font-size: 1.4em;">RSIA <span class="text-secondary">Restu Ibu</span></h1>
+                <a href="index" class="navbar-brand d-flex align-items-center">
+                    <!-- Logo Gambar -->
+                    <img src="img/<?php echo htmlspecialchars($site_logo); ?>" alt="Logo" style="height: 45px; width: auto; margin-right: 10px;">
+                    <!-- Teks Brand -->
+                    <div class="d-flex flex-column">
+                        <span class="text-primary fw-bold" style="font-size: 1.3rem; line-height: 1.1;">RSIA Restu Ibu</span>
+                        <small class="text-secondary" style="font-size: 0.65rem; letter-spacing: 0.5px;"><?php echo htmlspecialchars($site_motto); ?></small>
+                    </div>
                 </a>
                 
                 <!-- Tombol Hamburger Menu -->
@@ -82,17 +109,34 @@ if($currentPage == "") $currentPage = "index"; // root url
                         <a href="dokter" class="nav-item nav-link <?php echo ($currentPage == 'dokter') ? 'active' : ''; ?>">Dokter</a>
                         <a href="jadwal" class="nav-item nav-link <?php echo ($currentPage == 'jadwal') ? 'active' : ''; ?>">Jadwal</a>
                         <a href="team" class="nav-item nav-link <?php echo ($currentPage == 'team') ? 'active' : ''; ?>">Tim Kami</a>
-                        <a href="berita" class="nav-item nav-link <?php echo ($currentPage == 'berita' || $currentPage == 'artikel') ? 'active' : ''; ?>">Berita</a>
+                        <!-- Menu Berita dengan Notif -->
+                        <a href="berita" class="nav-item nav-link position-relative <?php echo ($currentPage == 'berita' || $currentPage == 'artikel') ? 'active' : ''; ?>">
+                            Berita
+                            <!-- Notifikasi jika ada berita baru -->
+                            <?php if($newPostsCount > 0): ?>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger ms-n3" style="font-size: 9px; animation: blinker 1.5s linear infinite;">
+                                    <?php echo $newPostsCount; ?>
+                                </span>
+                            <?php endif; ?>
+                        </a>
                         
                         <!-- Dropdown Berkas -->
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle <?php echo ($currentPage == 'download' || $currentPage == 'pengumuman') ? 'active' : ''; ?>" data-bs-toggle="dropdown">Berkas</a>
                             <div class="dropdown-menu m-0 bg-secondary rounded-0">
-                                <a href="pengumuman" class="dropdown-item <?php echo ($currentPage == 'pengumuman') ? 'active' : ''; ?>">Pengumuman</a>
+                                <!-- Menu Pengumuman dengan Notif Inline -->
+                                <a href="pengumuman" class="dropdown-item <?php echo ($currentPage == 'pengumuman') ? 'active' : ''; ?>">
+                                    Pengumuman
+                                    <?php if($newAnnCount > 0): ?>
+                                        <!-- Notif Sejajar dengan teks -->
+                                        <span class="badge rounded-pill bg-danger ms-2" style="font-size: 9px; animation: blinker 1.5s linear infinite;">
+                                            <?php echo $newAnnCount; ?> Baru
+                                        </span>
+                                    <?php endif; ?>
+                                </a>
                                 <a href="download" class="dropdown-item <?php echo ($currentPage == 'download') ? 'active' : ''; ?>">Download</a>
                             </div>
                         </div>
-                        <!-- End Dropdown -->
                     </div>
                     
                     <!-- Bagian Telepon (Hanya muncul di Layar Besar) -->
