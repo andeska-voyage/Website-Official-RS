@@ -2,6 +2,9 @@
  $pageTitle = "Jadwal Dokter";
 require_once 'config/database.php';
  $db = new Database();
+ 
+ $pageTitle = $row['title'];
+ $metaDesc = substr(strip_tags($row['content']), 0, 150); // Ambil 150 karakter awal
 
 // Query TANPA ALIAS (menggunakan nama tabel penuh)
  $sql = "SELECT 

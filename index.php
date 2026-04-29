@@ -2,6 +2,9 @@
  $pageTitle = "RSIA Restu Ibu Official";
 require_once 'config/database.php';
 
+$pageTitle = $row['title'];
+ $metaDesc = substr(strip_tags($row['content']), 0, 150); // Ambil 150 karakter awal
+
  $db = new Database();
 
 // === PERBAIKAN 1: Query data dokter harus ada di sini ===
@@ -33,21 +36,100 @@ require_once 'config/database.php';
  $jadwal_hari_ini = $db->resultSet();
 
 require_once 'inc/header.php';
+
 ?>
 
-    <!-- Hero Start -->
-    <div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">
-        <div class="container py-5">
-            <div class="row g-5 align-items-center">
-                <div class="col-lg-7 col-md-12 text-center text-lg-start">
-                    <h1 class="mb-3 text-primary">We Care Your Baby</h1>
-                    <h1 class="mb-5 display-1 text-white">RSIA Restu Ibu Melayani Dengan Kasih Ibu</h1>
-                    <a href="layanan" class="btn btn-primary px-4 py-3 px-md-5 btn-border-radius">Learn More</a>
+    <!-- Hero Start old -->
+    <!--<div class="container-fluid py-5 hero-header wow fadeIn" data-wow-delay="0.1s">-->
+    <!--    <div class="container py-5">-->
+    <!--        <div class="row g-5 align-items-center">-->
+    <!--            <div class="col-lg-7 col-md-12 text-center text-lg-start">-->
+    <!--                <h1 class="mb-3 text-primary">We Care Your Baby</h1>-->
+    <!--                <h1 class="mb-5 display-1 text-white">RSIA Restu Ibu Melayani Dengan Kasih Ibu</h1>-->
+    <!--                <a href="layanan" class="btn btn-primary px-4 py-3 px-md-5 btn-border-radius">Learn More</a>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--</div>-->
+    <!-- Hero End -->
+    
+<!-- Hero Slider Start -->
+<?php
+// Ambil data slide dari database
+ $db->query("SELECT * FROM slides ORDER BY ordering ASC");
+ $slides = $db->resultSet();
+?>
+
+<div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+    
+    <!-- INDIKATOR (BULATAN) - TARUH PALING ATAS -->
+    <div class="carousel-indicators">
+        <?php 
+        $slide_count = 0;
+        if(!empty($slides)) : 
+            foreach($slides as $slide) : 
+        ?>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="<?php echo $slide_count; ?>" 
+                    class="<?php echo ($slide_count == 0) ? 'active' : ''; ?>" 
+                    aria-current="<?php echo ($slide_count == 0) ? 'true' : 'false'; ?>" 
+                    aria-label="Slide <?php echo $slide_count + 1; ?>"></button>
+        <?php 
+                $slide_count++;
+            endforeach; 
+        endif; 
+        ?>
+    </div>
+
+    <div class="carousel-inner">
+        <?php 
+        $active = 'active';
+        if(!empty($slides)) :
+            foreach($slides as $slide) :
+        ?>
+        <div class="carousel-item <?php echo $active; ?>">
+            <img src="img/<?php echo htmlspecialchars($slide['image']); ?>" alt="<?php echo htmlspecialchars($row['title']); ?>" class="d-block w-100" alt="<?php echo htmlspecialchars($slide['title']); ?>">
+            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                <div class="p-5" style="max-width: 900px;">
+                    <?php if($slide['title']): ?>
+                        <h1 class="display-2 text-white mb-4 animated fadeInUp"><?php echo htmlspecialchars($slide['title']); ?></h1>
+                    <?php endif; ?>
+                    <?php if($slide['subtitle']): ?>
+                        <p class="fs-5 text-white mb-4 animated fadeInDown"><?php echo htmlspecialchars($slide['subtitle']); ?></p>
+                    <?php endif; ?>
+                    <?php if($slide['btn_text']): ?>
+                        <a href="<?php echo htmlspecialchars($slide['btn_link']); ?>" class="btn btn-primary rounded-pill py-3 px-5 mt-2 animated fadeIn">
+                            <?php echo htmlspecialchars($slide['btn_text']); ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
+        <?php 
+            $active = '';
+            endforeach;
+        else :
+        ?>
+            <!-- Fallback -->
+            <div class="carousel-item active">
+                <img src="img/hero-img.jpg" class="d-block w-100" alt="Hero">
+                <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                    <h1 class="display-2 text-white mb-4 animated fadeInUp">Selamat Datang</h1>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
-    <!-- Hero End -->
+
+    <!-- TOMBOL PANAH (PREV/NEXT) -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+<!-- Hero Slider End -->
 
 
     <!-- About Start -->
@@ -62,22 +144,24 @@ require_once 'inc/header.php';
                     </div>
                 </div>
                 <div class="col-lg-7 wow fadeIn" data-wow-delay="0.3s">
-                    <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">About Us</h4>
+                    <h4 class="text-primary mb-4 border-bottom border-primary border-2 d-inline-block p-2 title-border-radius">Tentang Kami</h4>
                     <h1 class="text-dark mb-4 display-5">Layanan Unggulan</h1>
                     <p class="text-dark mb-4">Rumah Sakit Ibu dan Anak Restu Ibu mempunyai banyak departemen yang terbagi menjadi berbagai poliklinik. Berikut adalah layanan utama kami.</p>
                     <div class="row mb-4">
                         <div class="col-lg-6">
                             <h6 class="mb-3"><i class="fas fa-check-circle me-2"></i>Poliklinik Anak</h6>
                             <h6 class="mb-3"><i class="fas fa-check-circle me-2 text-primary"></i>Poliklinik Kandungan</h6>
-                            <h6 class="mb-3"><i class="fas fa-check-circle me-2 text-secondary"></i>Poliklinik Penyakit Dalam</h6>
+                            <h6 class="mb-3"><i class="fas fa-check-circle me-2 text-secondary"></i>Fetomaternal</h6>
+                            <h6 class="mb-3"><i class="fas fa-check-circle me-2 text-info"></i>Poliklinik Penyakit Dalam</h6>
                         </div>
                         <div class="col-lg-6">
-                            <h6 class="mb-3"><i class="fas fa-check-circle me-2"></i>Home Visit & Pijat Laktasi</h6>
-                            <h6 class="mb-3"><i class="fas fa-check-circle me-2 text-primary"></i>Jumat Berkah & USG Gratis</h6>
-                            <h6><i class="fas fa-check-circle me-2 text-secondary"></i>...</h6>
+                            <h6 class="mb-3"><i class="fas fa-check-circle me-2"></i>Layanan Imunisasi</h6>
+                            <h6 class="mb-3"><i class="fas fa-check-circle me-2 text-primary"></i>Home Visit & Pijat Laktasi</h6>
+                            <h6 class="mb-3"><i class="fas fa-check-circle me-2 text-secondary"></i>Jumat Berkah & USG Gratis</h6>
+                            <h6 class="mb-3"><i class="fas fa-check-circle me-2 text-info"></i>Dan Lain - lain</h6>
                         </div>
                     </div>
-                    <a href="layanan" class="btn btn-primary px-5 py-3 btn-border-radius">More Details</a>
+                    <a href="layanan" class="btn btn-primary px-5 py-3 btn-border-radius">Lihat Lebih Banyak</a>
                 </div>
             </div>
         </div>
@@ -105,8 +189,9 @@ require_once 'inc/header.php';
                         <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.1); transform: skewY(-6deg);"></div>
                         
                         <i class="<?php echo $a['icon']; ?> fa-4x text-white mb-4 position-relative"></i>
+                        <!-- Di dalam loop foreach achievements di index.php -->
                         <h1 class="display-3 text-white mb-3 position-relative fw-bold">
-                            <?php echo number_format($a['count'], 0, ',', '.'); ?>
+                            <?php echo $a['value']; // Tidak pakai number_format ?>
                         </h1>
                         <h5 class="text-white position-relative mb-0" style="line-height: 1.4;">
                             <?php echo htmlspecialchars($a['title']); ?>
@@ -172,7 +257,7 @@ require_once 'inc/header.php';
                 <?php endif; ?>
             </div>
             <div class="text-center mt-4">
-                <a href="jadwal" class="btn btn-primary rounded-pill px-5 py-3">Lihat Semua Jadwal</a>
+                <a href="dokter" class="btn btn-primary rounded-pill px-5 py-3">Lihat Semua Dokter Kami</a>
             </div>
         </div>
     </div>

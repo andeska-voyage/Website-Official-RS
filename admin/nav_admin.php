@@ -18,13 +18,14 @@ if (!isset($db)) {
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <!-- TAMBAHAN: Favicon -->
     <link rel="icon" href="../img/<?php echo htmlspecialchars($adminLogo); ?>">
     
     <style>
-        /* ... (CSS Anda Tetap Sama Persis, Tidak Diubah ...) */
         :root {
             --sidebar-width: 250px;
             --primary-color: #4a51f9; /* Modern Blue/Purple */
@@ -155,20 +156,69 @@ if (!isset($db)) {
             background-color: #f0f0f0;
         }
 
-        /* Responsive */
+        /* ================================================== */
+        /* RESPONSIVE FIXES (TAMBAHAN UNTUK MOBILE) */
+        /* ================================================== */
+        
+        /* Overlay Gelap */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none; /* Default tersembunyi */
+        }
+        /* Class aktif saat sidebar dibuka */
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* Tombol Hamburger (Hidden di Desktop) */
+        #sidebarToggle {
+            display: none; /* Hidden default */
+            border: none;
+            background: #f5f8fa;
+            font-size: 1.5rem;
+            color: #333;
+            margin-right: 15px;
+        }
+
         @media (max-width: 992px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; }
+            /* Sembunyikan sidebar ke kiri */
+            .sidebar { 
+                transform: translateX(-100%); 
+            }
+            /* Saat aktif, munculkan */
+            .sidebar.active { 
+                transform: translateX(0); 
+                position: fixed; /* Pastikan fixed */
+                z-index: 1050;   /* Di atas konten */
+            }
+            
+            /* Content memenuhi layar */
+            .main-content { 
+                margin-left: 0; 
+            }
+
+            /* Tampilkan Tombol Hamburger */
+            #sidebarToggle {
+                display: block;
+            }
         }
     </style>
 </head>
 <body>
 
+    <!-- Overlay (Untuk menutup sidebar saat diklik area kosong) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- Sidebar -->
-    <nav class="sidebar">
+    <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <!-- TAMBAHAN: Logo Gambar -->
+            <!-- Logo -->
             <img src="../img/<?php echo htmlspecialchars($adminLogo); ?>" alt="Logo" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #fff; margin-bottom: 10px; object-fit: cover;">
             
             <h5 class="mb-0 fw-bold">RSIA Admin</h5>
@@ -184,6 +234,12 @@ if (!isset($db)) {
             <div class="menu-label">Master Data</div>
             <a href="settings" class="nav-link <?php echo (basename($_SERVER['PHP_SELF'])=='settings')?'active':''; ?>">
                 <i class="bi bi-gear-fill"></i> Profil RS
+            </a>
+            <a href="slides" class="nav-link <?php echo (basename($_SERVER['PHP_SELF'])=='slides')?'active':''; ?>">
+                <i class="fas fa-images"></i> Slides
+            </a>
+            <a href="services" class="nav-link <?php echo (basename($_SERVER['PHP_SELF'])=='services')?'active':''; ?>">
+                <i class="fas fa-concierge-bell"></i> Layanan
             </a>
             <a href="achievements" class="nav-link <?php echo (basename($_SERVER['PHP_SELF'])=='achievements')?'active':''; ?>">
                 <i class="bi bi-bar-chart-fill"></i> Pencapaian
@@ -226,7 +282,7 @@ if (!isset($db)) {
             </a>
             
             <div class="mt-5 px-3 d-grid">
-                 <a href="../index" class="btn btn-sm btn-outline-light rounded-pill"><i class="bi bi-eye me-2"></i>Lihat Website</a>
+                 <a href="../index" target="_blank" class="btn btn-sm btn-outline-light rounded-pill"><i class="bi bi-eye me-2"></i>Lihat Website</a>
             </div>
         </div>
     </nav>
@@ -235,9 +291,17 @@ if (!isset($db)) {
     <div class="main-content">
         <!-- Topbar -->
         <div class="topbar">
-            <h4 class="mb-0 fw-bold"><?php echo isset($pageTitle) ? $pageTitle : 'Dashboard'; ?></h4>
             <div class="d-flex align-items-center">
-                <span class="me-3 text-muted small">Welcome, <?php echo $_SESSION['admin_user'] ?? 'Admin'; ?></span>
+                <!-- TOMBOL HAMBURGER (Hanya muncul di HP) -->
+                <button id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <h4 class="mb-0 fw-bold"><?php echo isset($pageTitle) ? $pageTitle : 'Dashboard'; ?></h4>
+            </div>
+            
+            <div class="d-flex align-items-center">
+                <span class="me-3 text-muted small d-none d-sm-block">Welcome, <?php echo $_SESSION['admin_user'] ?? 'Admin'; ?></span>
                 <a href="logout" class="btn btn-sm btn-outline-danger"><i class="bi bi-box-arrow-right"></i></a>
             </div>
         </div>

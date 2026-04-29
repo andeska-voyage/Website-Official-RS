@@ -2,18 +2,20 @@
  $pageTitle = "Berita & Artikel";
 require_once 'config/database.php';
  $db = new Database();
+ 
+ $pageTitle = $row['title'];
+ $metaDesc = substr(strip_tags($row['content']), 0, 150); // Ambil 150 karakter awal
 
 // Ambil parameter
  $category_filter = $_GET['category'] ?? '';
  $search_query = $_GET['search'] ?? '';
 
-// Pagination Setup
+// ================= LOGIC PAGINATION =================
  $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
  $limit = 6; // Jumlah berita per halaman
  $offset = ($page > 1) ? ($page * $limit) - $limit : 0;
 
-// === LOGIKA QUERY DINAMIS ===
-// 1. Query Hitung Total
+// 1. Query Hitung Total Data
  $sql_count = "SELECT COUNT(*) as total FROM posts p LEFT JOIN categories c ON p.category_id = c.id";
  $where_clauses = [];
  $params_count = [];
@@ -36,7 +38,7 @@ foreach($params_count as $key => $val) { $db->bind($key, $val); }
  $count = $db->single();
  $totalPages = ceil($count['total'] / $limit);
 
-// 2. Query Ambil Data
+// 2. Query Ambil Data Berita
  $sql_data = "SELECT p.*, c.name as category_name, c.slug as category_slug 
              FROM posts p 
              LEFT JOIN categories c ON p.category_id = c.id";
@@ -51,7 +53,7 @@ foreach($params_count as $key => $val) { $db->bind($key, $val); }
  $db->bind(':limit', $limit, PDO::PARAM_INT);
  $posts = $db->resultSet();
 
-// Ambil Kategori untuk Sidebar
+// Ambil Kategori + Hitung Jumlah Post per Kategori
  $db->query("SELECT c.id, c.name, c.slug, COUNT(p.id) as post_count 
             FROM categories c 
             LEFT JOIN posts p ON c.id = p.category_id 
@@ -74,7 +76,7 @@ require_once 'inc/header.php';
         <div class="container">
             <div class="row g-4">
                 
-                <!-- Kolom Kiri -->
+                <!-- Kolom Kiri (Berita) -->
                 <div class="col-lg-8">
                     
                     <!-- Form Pencarian -->
@@ -85,7 +87,7 @@ require_once 'inc/header.php';
                                     <?php if($category_filter): ?>
                                         <input type="hidden" name="category" value="<?php echo htmlspecialchars($category_filter); ?>">
                                     <?php endif; ?>
-                                    <input type="text" name="search" class="form-control form-control-lg border-0" placeholder="Cari judul atau isi berita..." value="<?php echo htmlspecialchars($search_query ?? ''); ?>">
+                                    <input type="text" name="search" class="form-control border-0" placeholder="Cari judul atau isi berita..." value="<?php echo htmlspecialchars($search_query ?? ''); ?>">
                                     <button class="btn btn-primary px-4" type="submit"><i class="fas fa-search"></i></button>
                                     <?php if($search_query): ?>
                                         <a href="berita<?php echo $category_filter ? '?category='.$category_filter : ''; ?>" class="btn btn-secondary px-3"><i class="fas fa-times"></i></a>
@@ -95,7 +97,7 @@ require_once 'inc/header.php';
                         </div>
                     </div>
 
-                    <!-- Hasil Pencarian Info -->
+                    <!-- Info Hasil Pencarian -->
                     <?php if($search_query): ?>
                         <div class="alert alert-info py-2 mb-4">
                             Menampilkan hasil pencarian untuk: "<strong><?php echo htmlspecialchars($search_query); ?></strong>"
@@ -111,7 +113,7 @@ require_once 'inc/header.php';
                                         <div class="col-md-4">
                                             <a href="artikel?data=<?php echo base64_encode($post['id']); ?>" class="d-block h-100">
                                                 <div class="blog-img-wrapper">
-                                                    <img src="img/<?php echo htmlspecialchars($post['image']); ?>" class="w-100" alt="">
+                                                    <img src="img/<?php echo htmlspecialchars($post['image']); ?>" alt="<?php echo htmlspecialchars($row['title']); ?>" class="w-100" alt="">
                                                 </div>
                                             </a>
                                         </div>
@@ -146,7 +148,7 @@ require_once 'inc/header.php';
                             </div>
                         <?php endif; ?>
 
-                        <!-- === PAGINATION === -->
+                        <!-- ================== FITUR PAGINATION ================== -->
                         <?php if($totalPages > 1): ?>
                         <div class="col-12 mt-5">
                             <nav>
@@ -157,7 +159,7 @@ require_once 'inc/header.php';
                                             <i class="fas fa-chevron-left"></i>
                                         </a>
                                     </li>
-
+                                    
                                     <!-- Nomor Halaman -->
                                     <?php for($i = 1; $i <= $totalPages; $i++): ?>
                                     <li class="page-item <?php echo ($page == $i) ? 'active' : ''; ?>">
@@ -177,27 +179,34 @@ require_once 'inc/header.php';
                             </nav>
                         </div>
                         <?php endif; ?>
-                        <!-- End Pagination -->
+                        <!-- ======================================================= -->
 
                     </div>
                 </div>
 
-                <!-- Sidebar -->
+                <!-- Sidebar (Kategori) -->
                 <div class="col-lg-4">
                     <div class="card border-0 shadow-sm sidebar-widget mb-4" style="border-radius: 15px;">
                         <div class="card-body p-4">
                             <h5 class="mb-4 text-primary border-bottom border-primary border-2 d-inline-block pb-2">Kategori</h5>
                             <ul class="list-unstyled mb-0">
-                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                <!-- Menu Semua Berita -->
+                                <li class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
                                     <a href="berita" class="text-dark text-decoration-none <?php echo !$category_filter ? 'fw-bold text-primary' : ''; ?>">
                                         <i class="fas fa-angle-right text-primary me-2"></i>Semua Berita
                                     </a>
+                                    <!-- Total Semua Post -->
+                                    <span class="badge bg-primary rounded-pill"><?php echo $count['total']; ?></span>
                                 </li>
+                                
+                                <!-- List Kategori -->
                                 <?php foreach($categories as $cat): ?>
-                                <li class="d-flex justify-content-between align-items-center mb-3">
+                                <li class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
                                     <a href="berita?category=<?php echo $cat['slug']; ?>" class="text-dark text-decoration-none <?php echo ($category_filter == $cat['slug']) ? 'fw-bold text-primary' : ''; ?>">
                                         <i class="fas fa-angle-right text-primary me-2"></i><?php echo htmlspecialchars($cat['name']); ?>
                                     </a>
+                                    <!-- Badge Jumlah Post -->
+                                    <span class="badge bg-light text-dark rounded-pill"><?php echo $cat['post_count']; ?></span>
                                 </li>
                                 <?php endforeach; ?>
                             </ul>

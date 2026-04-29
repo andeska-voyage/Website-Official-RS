@@ -2,6 +2,9 @@
  $pageTitle = "Pengumuman";
 require_once 'config/database.php';
  $db = new Database();
+ 
+ $pageTitle = $row['title'];
+ $metaDesc = substr(strip_tags($row['content']), 0, 150); // Ambil 150 karakter awal
 
 // Logika Pencarian
  $search_query = isset($_GET['search']) ? $_GET['search'] : '';
@@ -56,7 +59,7 @@ require_once 'inc/header.php';
                         <div class="card-body p-3">
                             <form method="GET" action="">
                                 <div class="input-group">
-                                    <input type="text" name="search" class="form-control form-control-lg border-0" placeholder="Cari pengumuman..." value="<?php echo htmlspecialchars($search_query); ?>">
+                                    <input type="text" name="search" class="form-control border-0" placeholder="Cari pengumuman..." value="<?php echo htmlspecialchars($search_query); ?>">
                                     <button class="btn btn-primary px-4" type="submit"><i class="fas fa-search"></i></button>
                                     <?php if($search_query): ?>
                                         <a href="pengumuman" class="btn btn-secondary px-3"><i class="fas fa-times"></i></a>

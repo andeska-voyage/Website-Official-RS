@@ -2,6 +2,9 @@
  $pageTitle = "Detail Pengumuman";
 require_once 'config/database.php';
  $db = new Database();
+ 
+ $pageTitle = $row['title'];
+ $metaDesc = substr(strip_tags($row['content']), 0, 150); // Ambil 150 karakter awal
 
 // Decode ID dari Base64
  $encrypted_id = isset($_GET['data']) ? $_GET['data'] : '';

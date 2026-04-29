@@ -2,6 +2,9 @@
  $pageTitle = "Detail Berita";
 require_once 'config/database.php';
  $db = new Database();
+ 
+ $pageTitle = $row['title'];
+ $metaDesc = substr(strip_tags($row['content']), 0, 150); // Ambil 150 karakter awal
 
 // === 1. Ambil Data Logo untuk Author Box ===
  $db->query("SELECT logo FROM site_profile WHERE id=1");
@@ -35,12 +38,12 @@ require_once 'inc/header.php';
     <!-- Header -->
     <div class="container-fluid page-header py-5 wow fadeIn" data-wow-delay="0.1s">
         <div class="container text-center py-5">
-            <h1 class="display-2 text-white mb-4">Detail Berita</h1>
+            <h1 class="display-5 text-white mb-4">Detail Berita</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb justify-content-center mb-0">
                     <li class="breadcrumb-item"><a href="index">Home</a></li>
                     <li class="breadcrumb-item"><a href="berita">Berita</a></li>
-                    <li class="breadcrumb-item text-white" aria-current="page">Detail</li>
+                    <li class="breadcrumb-item text-white active" aria-current="page">Detail</li>
                 </ol>
             </nav>
         </div>
@@ -57,25 +60,44 @@ require_once 'inc/header.php';
                     <div class="bg-white p-4 p-md-5 rounded shadow-sm">
                         
                         <!-- Meta Info -->
-                        <div class="d-flex flex-wrap align-items-center mb-4 border-bottom pb-4">
+                        <div class="d-flex flex-wrap align-items-center mb-3">
                             <?php if($row['cat_name']): ?>
-                            <a href="berita?category=<?php echo $row['cat_slug']; ?>" class="badge bg-primary text-white px-3 py-2 me-3 mb-2" style="font-size: 0.9rem;">
+                            <a href="berita?category=<?php echo $row['cat_slug']; ?>" class="badge bg-primary text-white px-3 py-2 me-3 mb-2">
                                 <i class="fas fa-folder me-1"></i> <?php echo $row['cat_name']; ?>
                             </a>
                             <?php endif; ?>
-                            <span class="text-muted me-3 mb-2">
+                            <span class="text-muted mb-2">
                                 <i class="far fa-calendar-alt text-primary me-1"></i> <?php echo date('d F Y', strtotime($row['created_at'])); ?>
                             </span>
                         </div>
 
                         <!-- Judul -->
-                        <h2 class="mb-4 text-dark" style="font-weight: 700; line-height: 1.4;">
+                        <h2 class="mb-2 text-dark" style="font-weight: 700; line-height: 1.3;">
                             <?php echo htmlspecialchars($row['title']); ?>
                         </h2>
 
-                        <!-- Gambar Utama -->
-                        <div class="mb-4 rounded overflow-hidden">
-                            <img src="img/<?php echo htmlspecialchars($row['image']); ?>" class="img-fluid w-100" alt="" style="max-height: 400px; object-fit: cover;">
+                        <!-- === SHARE BUTTONS === -->
+                        <div class="share-buttons-top d-flex align-items-center gap-2 flex-wrap">
+                            <span class="text-muted small fw-bold me-2">Share:</span>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>" target="_blank" class="btn btn-primary btn-sm">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://twitter.com/intent/tweet?url=<?php echo 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>&text=<?php echo urlencode($row['title']); ?>" target="_blank" class="btn btn-info btn-sm text-white">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="https://api.whatsapp.com/send?text=<?php echo urlencode($row['title'] . ' ' . 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>" target="_blank" class="btn btn-success btn-sm">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                             <!-- Tambahan: Copy Link -->
+                            <button onclick="copyToClipboard('<?php echo 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>')" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-link"></i>
+                            </button>
+                        </div>
+                        <!-- End Share Buttons -->
+
+                        <!-- Gambar Utama (PERHATIKAN: mt-3 ditambahkan di sini) -->
+                        <div class="mt-3 rounded overflow-hidden">
+                            <img src="img/<?php echo htmlspecialchars($row['image']); ?>" alt="<?php echo htmlspecialchars($row['title']); ?>" class="img-fluid w-100" alt="" style="max-height: 400px; object-fit: cover;">
                         </div>
 
                         <!-- Isi Konten -->
@@ -83,43 +105,16 @@ require_once 'inc/header.php';
                             <?php echo $row['content']; ?>
                         </div>
 
-                        <!-- === BAGIAN SHARE BUTTON (RAPPI & RESPONSIF) === -->
-                        <div class="mt-5 pt-4 border-top">
-                            <div class="row align-items-center">
-                                <div class="col-md-4 mb-3 mb-md-0">
-                                    <h6 class="mb-0 text-dark fw-bold">Bagikan artikel ini:</h6>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="d-flex justify-content-md-end justify-content-center gap-2">
-                                        <!-- Facebook -->
-                                        <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>" target="_blank" class="btn btn-primary px-3 py-2" style="min-width: 100px;">
-                                            <i class="fab fa-facebook-f me-1"></i> <span class="d-none d-sm-inline">Facebook</span>
-                                        </a>
-                                        <!-- Twitter -->
-                                        <a href="https://twitter.com/intent/tweet?url=<?php echo 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; ?>&text=<?php echo urlencode($row['title']); ?>" target="_blank" class="btn btn-info text-white px-3 py-2" style="min-width: 100px;">
-                                            <i class="fab fa-twitter me-1"></i> <span class="d-none d-sm-inline">Twitter</span>
-                                        </a>
-                                        <!-- WhatsApp -->
-                                        <a href="https://api.whatsapp.com/send?text=<?php echo urlencode($row['title'] . ' ' . 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>" target="_blank" class="btn btn-success px-3 py-2" style="min-width: 100px;">
-                                            <i class="fab fa-whatsapp me-1"></i> <span class="d-none d-sm-inline">WhatsApp</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End Share -->
-
                     </div>
 
-                    <!-- === AUTHOR BOX (PAKAI LOGO RS) === -->
+                    <!-- Author Box -->
                     <div class="bg-white p-4 rounded shadow-sm mt-4">
                         <div class="d-flex align-items-center">
-                            <!-- Logo RS -->
                             <img src="img/<?php echo htmlspecialchars($siteLogo); ?>" class="rounded-circle border border-primary shadow-sm" style="width: 80px; height: 80px; object-fit: cover;" alt="Logo RSIA">
                             <div class="ms-3">
                                 <h5 class="mb-1 text-primary">RSIA Restu Ibu</h5>
-                                <p class="mb-0 text-muted small" style="font-size: 0.9rem;">
-                                    Rumah Sakit Ibu dan Anak yang melayani dengan kasih sayang ibu. Memberikan pelayanan kesehatan terbaik untuk ibu dan anak.
+                                <p class="mb-0 text-muted small">
+                                    Rumah Sakit Ibu dan Anak yang melayani dengan kasih sayang ibu.
                                 </p>
                             </div>
                         </div>
@@ -140,14 +135,13 @@ require_once 'inc/header.php';
                     <?php endif; ?>
                 </div>
 
-                <!-- Sidebar (Opsional) -->
+                <!-- Sidebar -->
                 <div class="col-lg-4 mt-4 mt-lg-0">
-                     <!-- Widget Info -->
                      <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
                         <div class="card-body p-4">
                             <h5 class="mb-3 text-primary border-bottom border-primary border-2 d-inline-block pb-2">Informasi</h5>
                             <p class="text-muted small mb-0">
-                                Artikel ini ditulis oleh tim redaksi RSIA Restu Ibu. Untuk informasi lebih lanjut, silakan hubungi kontak kami.
+                                Artikel ini ditulis oleh tim redaksi RSIA Restu Ibu.
                             </p>
                         </div>
                     </div>
@@ -156,5 +150,16 @@ require_once 'inc/header.php';
             </div>
         </div>
     </div>
+
+    <!-- Script untuk Copy Link -->
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('Link berhasil disalin!');
+            }, function(err) {
+                prompt("Salin link ini: Ctrl+C, Enter", text);
+            });
+        }
+    </script>
 
 <?php require_once 'inc/footer.php'; ?>

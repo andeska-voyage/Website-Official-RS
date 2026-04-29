@@ -1,22 +1,46 @@
-RewriteEngine On
+# ======================================================
+# SERVER SETTINGS & SECURITY
+# ======================================================
 
-# 1. Proteksi Folder (Forbidden Access)
+# Matikan Index otomatis (folder tidak bisa dilihat isinya)
 Options -Indexes
 
-# 2. Redirect URL yang pakai .php ke versi TANPA .php
-# PENTING: Tambahkan kondisi !POST agar form login tidak error
+RewriteEngine On
+
+# ======================================================
+# 1. REDIRECT .PHP KE TANPA .PHP (SEO FRIENDLY)
+# ======================================================
+# Penting: !POST agar form login/tidak error saat submit data
 RewriteCond %{REQUEST_METHOD} !POST
 RewriteCond %{THE_REQUEST} /([^.]+)\.php [NC]
-RewriteRule ^ /_Companyprofile/%1? [NC,L,R=301]
+RewriteRule ^ /%1? [NC,L,R=301]
 
-# 3. Rewrite Internal (System baca file .php)
-# Contoh: user ketik 'artikel', system buka 'artikel.php'
+# ======================================================
+# 2. REWRITE INTERNAL (System baca file .php)
+# ======================================================
+# Contoh: user akses 'about', server membaca 'about.php'
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
 RewriteRule ^(.*)$ $1.php [NC,L]
 
-# 4. Proteksi File Sensitif
-<FilesMatch "\.(htaccess|sql|log|ini|json)$">
+# ======================================================
+# 3. SECURITY HEADERS (Proteksi Modern)
+# ======================================================
+<IfModule mod_headers.c>
+    # Mencegah website di-embed (Clickjacking)
+    Header always set X-Frame-Options "SAMEORIGIN"
+    # Mencegah browser menebak tipe file (MIME Sniffing)
+    Header always set X-Content-Type-Options "nosniff"
+    # Proteksi XSS lama
+    Header always set X-XSS-Protection "1; mode=block"
+    # Kontrol Referrer
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ======================================================
+# 4. ACCESS CONTROL (Blokir File Sensitif)
+# ======================================================
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sql|json|bak|config\.php)$">
     Order allow,deny
     Deny from all
 </FilesMatch>
