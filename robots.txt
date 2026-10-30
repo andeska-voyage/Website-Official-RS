@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /config/
 
-Sitemap: https://official.rsiarestuibu.my.id/sitemap.xml
+Sitemap: 
