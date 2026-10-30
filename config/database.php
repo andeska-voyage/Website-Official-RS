@@ -111,6 +111,6 @@ class Database {
 // Kredensial DB
 define('DB_HOST', 'localhost');
 define('DB_USER', 'dbrsia');
-define('DB_PASS', 'C6khnXmnepp5rmDy');
+define('DB_PASS', '');
 define('DB_NAME', 'dbrsia');
 ?>
