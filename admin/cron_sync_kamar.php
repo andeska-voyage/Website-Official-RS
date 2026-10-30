@@ -23,10 +23,10 @@ require_once __DIR__ . '/../config/database.php';
  $db = new Database();
 
 // 3. Koneksi ke SIMRS Khanza
- $simrs_host = '192.168.0.2';
- $simrs_db   = 'sik_apr2026';
- $simrs_user = 'sik_apr2026';
- $simrs_pass = 'ZKJmsX8cEEm23rcw';
+ $simrs_host = 'localhost';
+ $simrs_db   = 'sik';
+ $simrs_user = 'sik';
+ $simrs_pass = '';
 
 try {
     $pdo_simrs = new PDO("mysql:host=$simrs_host;dbname=$simrs_db", $simrs_user, $simrs_pass);
