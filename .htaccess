@@ -1,0 +1,48 @@
+# ======================================================
+# SERVER SETTINGS & SECURITY
+# ======================================================
+
+# Matikan Index otomatis (folder tidak bisa dilihat isinya)
+Options -Indexes
+
+RewriteEngine On
+
+# ======================================================
+# 1. REDIRECT .PHP KE TANPA .PHP (SEO FRIENDLY)
+# ======================================================
+# Penting: !POST agar form login/tidak error saat submit data
+RewriteCond %{REQUEST_METHOD} !POST
+RewriteCond %{THE_REQUEST} /([^.]+)\.php [NC]
+RewriteRule ^ /%1? [NC,L,R=301]
+
+# ======================================================
+# 2. REWRITE INTERNAL (System baca file .php)
+# ======================================================
+# Contoh: user akses 'about', server membaca 'about.php'
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [NC,L]
+
+# ======================================================
+# 3. SECURITY HEADERS (Proteksi Modern)
+# ======================================================
+<IfModule mod_headers.c>
+    # Mencegah website di-embed (Clickjacking)
+    Header always set X-Frame-Options "SAMEORIGIN"
+    # Mencegah browser menebak tipe file (MIME Sniffing)
+    Header always set X-Content-Type-Options "nosniff"
+    # Kontrol Referrer
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    # Batasi fitur browser yang tidak diperlukan oleh situs.
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    # Mulai dalam mode laporan agar kebijakan dapat ditinjau tanpa memblokir aset.
+    Header always set Content-Security-Policy-Report-Only "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
+</IfModule>
+
+# ======================================================
+# 4. ACCESS CONTROL (Blokir File Sensitif)
+# ======================================================
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sql|json|bak|config\.php)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

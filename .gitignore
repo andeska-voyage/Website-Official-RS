@@ -1,0 +1,16 @@
+# Private configuration
+/config/
+/database/
+
+# Temporary files
+/cache/
+*.log
+
+# Sensitive environment files
+.env
+.env.*
+!.env.example
+
+# Local development
+.DS_Store
+Thumbs.db
