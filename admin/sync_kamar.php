@@ -18,10 +18,10 @@ if (isset($_GET['action']) && $_GET['action'] == 'sync') {
         die("<script>alert('Akses ditolak! Sesi tidak valid.'); history.back();</script>");
     }
 
-    $simrs_host = '192.168.0.2';
-    $simrs_db   = 'sik_apr2026';
-    $simrs_user = 'sik_apr2026';
-    $simrs_pass = 'ZKJmsX8cEEm23rcw';
+    $simrs_host = 'localhost';
+    $simrs_db   = 'sik';
+    $simrs_user = 'sik';
+    $simrs_pass = '';
 
     try {
         // 1. Koneksikan ke SIMRS
