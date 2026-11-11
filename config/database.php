@@ -109,7 +109,7 @@ class Database {
 }
 
 // Kredensial DB
-define('DB_HOST', 'localhost');
+define('DB_HOST', '103.125.49.34');
 define('DB_USER', 'dbrsia');
 define('DB_PASS', '');
 define('DB_NAME', 'dbrsia');
